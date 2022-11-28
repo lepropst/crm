@@ -2,9 +2,9 @@
 # Create your views here.
 from rest_framework import viewsets
 
-from .serializers import TodoSerializer, NoteBookSerializer, NoteSerializer
+from .serializers import TodoSerializer, NoteBookSerializer, NoteSerializer, TodoListSerializer
 
-from .models import Todo, Note, NoteBook
+from .models import Todo, Note, NoteBook, TodoList
 
 
 class NoteBookViewSet(viewsets.ModelViewSet):
@@ -18,8 +18,8 @@ class NoteViewSet(viewsets.ModelViewSet):
 
 
 class TodoListViewSet(viewsets.ModelViewSet):
-    queryset = Todo.objects.all().order_by('label')
-    serializer_class = TodoSerializer
+    queryset = TodoList.objects.all().order_by('label')
+    serializer_class = TodoListSerializer
 
 
 class TodoViewSet(viewsets.ModelViewSet):

@@ -66,7 +66,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'crm.urls'
-CORS_ALLOWED_ORIGINS = ["http://localhost", "http://*"]
+# CORS_ALLOWED_ORIGINS = ["http://localhost", "http://localhost:1337", '0.0.0.0']
+CORS_ALLOW_ALL_ORIGINS = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

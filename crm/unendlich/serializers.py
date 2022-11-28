@@ -2,7 +2,7 @@ from django.forms import CharField
 from rest_framework import serializers
 
 
-from .models import Todo, Note, NoteBook
+from .models import Todo, Note, NoteBook, TodoList
 
 
 class NoteSerializer(serializers.ModelSerializer):
@@ -35,8 +35,9 @@ class TodoSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TodoSerializer(serializers.ModelSerializer):
+class TodoListSerializer(serializers.ModelSerializer):
+    todos = TodoSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Todo
+        model = TodoList
         fields = "__all__"
