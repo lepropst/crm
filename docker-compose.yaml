@@ -32,12 +32,12 @@ services:
     volumes:
     - ./nginx/frontend/static:/usr/share/nginx/html/static
   frontend:
-    build: ./frontend/unendlich
+    build: ./unendlich
     command: npm run dev
     ports: 
       - 3000:3000
     volumes:
-      - ./frontend/unendlich:/usr/src
+      - ./unendlich:/usr/src
 
 
 volumes:

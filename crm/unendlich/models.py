@@ -37,7 +37,7 @@ class Todo(models.Model):
                              on_delete=models.CASCADE, default=0)
     label = models.CharField(max_length=500)
     dateDue = models.DateTimeField()
-    description: models.CharField()
+    description = models.CharField()
 
     def __stsr__(self):
         return self.label
