@@ -17,10 +17,14 @@ from django.conf import settings
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import include, path
+from knox import views as knox_views
+from .views import LoginView
 
 urlpatterns = [
-    path('api/crm/', include("accounts.urls"), name="crm"),
-    path('api/unendlich/', include("unendlich.urls"), name='unendlich'),
-    path('api/admin/', admin.site.urls),
+    path('crm/crm/', include("accounts.urls"), name="crm"),
+    path('crm/unendlich/', include("unendlich.urls"), name='unendlich'),
+    path('crm/auth/', include("authentication.urls"), name="auth"),
+    path('crm/admin/', admin.site.urls),
+
 
 ]

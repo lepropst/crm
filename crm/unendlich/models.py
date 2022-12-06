@@ -1,4 +1,4 @@
-
+from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
@@ -6,6 +6,8 @@ from django.db import models
 
 
 class NoteBook(models.Model):
+    owner = models.ForeignKey(
+        User, related_name='notebooks', null=True, on_delete=models.CASCADE)
     label = models.CharField(max_length=100)
     dateEdited = models.CharField(max_length=50)
 
@@ -14,6 +16,8 @@ class NoteBook(models.Model):
 
 
 class Note(models.Model):
+    owner = models.ForeignKey(
+        User, related_name='notes', null=True, on_delete=models.CASCADE)
     notebook = models.ForeignKey(
         NoteBook, related_name="notes", on_delete=models.CASCADE)
     label = models.CharField(max_length=100)
@@ -26,6 +30,8 @@ class Note(models.Model):
 
 
 class TodoList(models.Model):
+    owner = models.ForeignKey(
+        User, related_name='lists', null=True, on_delete=models.CASCADE)
     label = models.CharField(max_length=200)
 
     def __str__(self):
@@ -33,11 +39,13 @@ class TodoList(models.Model):
 
 
 class Todo(models.Model):
+    owner = models.ForeignKey(
+        User, related_name='todos', null=True, on_delete=models.CASCADE)
     list = models.ForeignKey(TodoList, related_name="todos",
                              on_delete=models.CASCADE, default=0)
     label = models.CharField(max_length=500)
     dateDue = models.DateTimeField()
-    description = models.CharField()
+    description = models.CharField(max_length=10000, blank=True)
 
     def __stsr__(self):
         return self.label

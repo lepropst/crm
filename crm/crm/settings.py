@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+from datetime import timedelta
+from rest_framework.settings import api_settings
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,18 +35,31 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', ),
+
 }
 
+REST_KNOX = {
+    'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+    'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+    'TOKEN_TTL': timedelta(hours=24),
+    'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+    'TOKEN_LIMIT_PER_USER': None,
+    'AUTO_REFRESH': False,
+
+}
 
 # Application definition
 
 INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "unendlich.apps.UnendlichConfig",
+    "authentication.apps.AuthenticationConfig",
     "rest_framework",
+    'knox',
     "corsheaders",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -59,7 +74,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -67,6 +82,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'crm.urls'
 # CORS_ALLOWED_ORIGINS = ["http://localhost", "http://localhost:1337", '0.0.0.0']
+CORS_ALLOW_HEADERS = [
+    "Accept",
+    "Accept-Encoding",
+    "authorization",
+    "Content-Type",
+    "content-disposition",
+    "dnt",
+    "origin",
+    "User-Agent",
+    "Content-Length",
+    "X-XSRF-TOKEN",
+    "x-requested-with",
+]
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
