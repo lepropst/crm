@@ -1,18 +1,17 @@
 import { Todo } from "../todos/model";
 
 export class TodoList {
-  public id: number;
+  public id?: number;
   public label: string;
   public todos: Todo[];
-  constructor(_id: number, _label: string, _todos: Todo[]) {
+  public owner: string;
+  constructor(_label: string, _todos: Todo[], _owner: string, _id?: number) {
     this.id = _id;
     this.label = _label;
-    this.todos = _todos;
+    this.todos = _todos.map((e) => Todo.fromTodo(e));
+    this.owner = _owner;
   }
-  public static fromResponse(m: Map<string, any>) {
-    const id = m.get("id");
-    const label = m.get("label");
-    const todos = m.get("todos");
-    return new TodoList(id, label, todos);
+  public static fromTodoList(tl: TodoList) {
+    return new TodoList(tl.label, tl.todos, tl.owner, tl.id);
   }
 }

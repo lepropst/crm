@@ -1,73 +1,151 @@
 import axios from "axios";
 
-import { NextPageContext, NextPage } from "next";
-import { base_url, base_config } from "../utilities";
-import { ListViewer } from "../components/lists/ListViewer";
+import { NextPage } from "next";
+import { Renderer as ListComponent } from "../components/lists/";
 import { TodoList } from "../components/lists";
-import useSWR from "swr";
-import { Todo } from "../components/todos";
+import useSWR, { SWRConfig, useSWRConfig } from "swr";
+
+import { withSessionSsr } from "../utilities/withSession";
 import Axios from "../utilities/axios";
+import { useEffect, useState } from "react";
+import { Todo } from "../components/todos/model";
 
 interface Props {
-  lists: any[];
+  user: any;
 }
-const Page: NextPage<Props> = ({ lists }: Props) => {
-  const { data, error } = useSWR(
-    "/unendlich/lists/",
-    Axios.getInstance().fetcher
+
+const Page: NextPage<Props> = ({ user }: Props) => {
+  const [currentData, setCurrentData] = useState<TodoList>(
+    TodoList.fromTodoList({
+      label: "",
+      todos: [],
+      owner: user.id,
+    })
   );
+  const fetcher = async (url: string) => {
+    const res = await Axios.getInstance().axios.get(url, {
+      headers: {
+        Authorization: `Token ${user.token}`,
+        "Content-Type": "Application/json",
+      },
+    });
+
+    if (res.status !== 200) {
+      console.log("error occured");
+      throw new Error(res.data);
+    }
+    return res.data.map((e: TodoList) => TodoList.fromTodoList(e));
+  };
+
+  const { mutate } = useSWRConfig();
+  const { data, error } = useSWR("/unendlich/lists/", fetcher);
+  const [lists, setLists] = useState(data);
   const api = {
-    add: (todo: any) => {
-      console.log(typeof todo);
-      console.log(process.env);
-      const data = {
-        label: todo.label.value,
-        dateDue:
-          todo.dateDue.value || new Date("{{ selected_date.isoformat }}"),
-        description: todo.description.value || "",
-        list: todo.list.value,
-      };
-      axios
-        .post(
-          base_url + "/unendlich/todos/",
-          {
-            data: data,
-          },
-          {
-            auth: {
-              username: "root",
-              password: "ath",
-            },
-            headers: {
-              "Content-Type": "application/json",
-              // "X-CSRFToken": csrfToken,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((e) => console.log(e));
+    saveTodo: async (todo: Todo): Promise<void> => {
+      console.log("saving todo");
+      try {
+        await axios.put("/api/save", {
+          type: "todos",
+          ...todo,
+        });
+      } catch (e) {
+        console.log(e);
+      }
     },
-    edit: (list: TodoList) => {
-      console.log("editing list");
-      console.log(list);
-      return list;
+    addTodo: async (todo: Todo): Promise<void> => {
+      console.log("data tryiing to be added ", todo);
+      try {
+        await axios.post("/api/add", {
+          type: "todos",
+          ...todo,
+        });
+        mutate("/unendlich/lists/");
+      } catch (e) {
+        console.log(e);
+        alert("unable to delete todo list");
+      }
     },
-    delete: (id: number) => {
-      console.log("deleting: ", id);
+    deleteTodo: async (id: number) => {
+      try {
+        await axios.post("/api/delete/", { id: id, type: "todos" });
+        mutate("/unendlich/lists/");
+      } catch (e) {
+        console.log(e);
+        alert("unable to delete todo list");
+      }
+    },
+    deleteList: async (id: number) => {
+      try {
+        console.log(user);
+        await axios.post("/api/delete", { id: id, type: "lists" });
+        mutate("/unendlich/lists/");
+      } catch (e) {
+        console.log(e);
+        alert("unable to delete todo list");
+      }
+    },
+    addList: async (list: TodoList) => {
+      try {
+        await axios.post("/api/add", { type: "lists", ...list });
+        mutate("/unendlich/lists/");
+      } catch (e) {
+        console.log(e);
+        alert("unable to delete todo list");
+      }
     },
   };
-  if (error) return <div>failed to load</div>;
-  if (!data) return <div>loading...</div>;
+
   return (
-    <div className="flex flex-row spacing-x-3 bg-backgroundprimary h-screen w-screen">
-      {data.length > 0 &&
-        data.map((e: TodoList, i: number) => (
-          <ListViewer api={api} key={`${e.label}-${i}`} list={e} />
-        ))}
+    <div className="flex flex-col spacing-x-3 bg-backgroundprimary h-screen w-screen">
+      <form
+        className="h-16 w-screen flex space-x-2 justify-center items-center bg-white border border-primarydark"
+        onSubmit={(e) => {
+          e.preventDefault();
+
+          const todo: TodoList = {
+            label: currentData["label"],
+            todos: [],
+            owner: user.id,
+          };
+
+          api.addList(todo);
+          setCurrentData({ label: "", todos: [], owner: user.id });
+        }}
+      >
+        <input
+          type="text"
+          className="rounded"
+          name="label"
+          value={currentData.label}
+          onChange={(e) => {
+            e.preventDefault();
+            setCurrentData({
+              ...currentData,
+              owner: user.id,
+              label: e.target.value,
+            });
+          }}
+        ></input>
+        <button type="submit">add list</button>
+      </form>
+      <div className="flex overflow-x-auto">
+        {data &&
+          data.map((e: TodoList, i: number) => (
+            <ListComponent api={api} key={`${e.label}-${i}`} list={e} />
+          ))}
+      </div>
     </div>
   );
 };
+export const getServerSideProps = withSessionSsr(
+  async function getServerSideProps({ req }) {
+    const user = req.session.user;
+    return {
+      props: {
+        user: user,
+      },
+    };
+  }
+);
 
 export default Page;

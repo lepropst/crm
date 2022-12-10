@@ -1,10 +1,13 @@
 import axios from "axios";
+import { withIronSessionSsr } from "iron-session/next/dist";
 import { NextPage } from "next";
+import { useRouter, withRouter } from "next/router";
 import { useState } from "react";
-import Axios from "../utilities/axios";
+import { withSessionSsr } from "../utilities/withSession";
 
-export const Page: NextPage = (props) => {
+export const Page = (props: any) => {
   const [state, setState] = useState({ password: "", username: "" });
+  const router = useRouter();
   const handleSubmit = async (el: any) => {
     el.preventDefault();
     const password = state.password;
@@ -13,10 +16,8 @@ export const Page: NextPage = (props) => {
       alert("Invalid username/password");
     }
     try {
-      console.log("trying static login");
-
       const resp = await axios.post(
-        "http://localhost:1337/crm/auth/login/",
+        "http://localhost:3000/api/login/",
         { password: password, username: username },
         {
           headers: {
@@ -25,12 +26,16 @@ export const Page: NextPage = (props) => {
           auth: { password: password, username: username },
         }
       );
-      console.log(resp.data);
+      router.push("/");
+      return;
     } catch (e: any) {
       console.log("api to nnextjs eerror");
-      console.log(e);
+      console.log(e.response);
+      alert("Bad password or username");
+      return;
     }
   };
+
   return (
     <div className="flex w-screen h-screen items-center justify-center bg-backgroundprimary">
       <form
@@ -72,4 +77,5 @@ export const Page: NextPage = (props) => {
     </div>
   );
 };
-export default Page;
+
+export default withRouter(Page);

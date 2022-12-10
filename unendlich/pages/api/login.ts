@@ -1,40 +1,61 @@
-import axios from "axios";
+import { withIronSessionApiRoute } from "iron-session/next";
 
-import { NextApiHandler } from "next";
-import { NextRequest, NextResponse } from "next/server";
+import { NextApiRequest, NextApiResponse } from "next";
+import NextCors from "nextjs-cors";
+import Axios from "../../utilities/axios";
 
-import { withSessionRoute } from "../../utilities/withSession";
+export default withIronSessionApiRoute(
+  async function loginRoute(req, res) {
+    let username = req.body.username;
+    let password = req.body.password;
+    let error = false;
+    const tmp = "";
+    try {
+      let tmp1 = await Axios.getInstance().axios.post(
+        "http://localhost:1337/crm/auth/login/",
+        { password: password, username: username },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          auth: { password: password, username: username },
+        }
+      );
+      const toke = tmp1.data;
 
-export const handler: NextApiHandler<any> = async (req, res) => {
-  // get user from database then:
-  console.log("api login route hit");
-  console.log(req.body.body.username);
-  req.session.user = {
-    // login to api here
-    username: req.body.body.username,
-    password: req.body.body.password,
-    token: "",
-  };
-  let error = false;
-  try {
-    const axi = axios;
-    const response = await axi.post("http://localhost:1337/crm/auth/login/", {
-      username: req.body.body.username,
-      password: req.body.body.password,
-    });
-    console.log(response);
-    console.log(response);
-    req.session.user.token = response.data;
-  } catch (e: any) {
-    console.log("Error");
-    console.log(e);
-    error = true;
+      const id = await Axios.getInstance().axios.get("/auth/profile/", {
+        headers: { authorization: `Token ${toke.token}` },
+      });
+
+      console.log(id);
+      if (id.status !== 200) {
+        res.status(400).json({ error: true });
+      }
+      const user = {
+        username: tmp1.data.user.username,
+        password: req.body.password,
+        token: `${toke.token}`,
+        id: id.data.id,
+      };
+      req.session.user = user;
+      await req.session.save();
+
+      res.status(200).json({ ok: true });
+    } catch (e) {
+      console.log("error logging in");
+      console.log(e);
+      error = true;
+      res.status(400).json(new Error("Unable to login"));
+    }
+    // res.send(400);
+  },
+  {
+    password:
+      process.env.COOKIE_PASSWORD ||
+      "complex_password_at_least_32_characters_long",
+    cookieName: "unendlich_cookie", // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
+    cookieOptions: {
+      secure: process.env.NODE_ENV === "production",
+    },
   }
-  await req.session.save();
-  if (error) {
-    res.redirect("/login");
-  } else {
-    res.send("Logged in");
-  }
-};
-export default withSessionRoute(handler);
+);

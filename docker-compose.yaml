@@ -33,6 +33,8 @@ services:
     - ./nginx/frontend/static:/usr/share/nginx/html/static
   frontend:
     build: ./unendlich
+    depends_on:
+      - web
     ports: 
       - 3000:3000
     volumes:

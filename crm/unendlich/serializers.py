@@ -11,7 +11,7 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ['id', 'notebook', 'label', 'dateEdited', 'content']
+        fields = ['id', 'notebook', 'label', 'dateEdited', 'content', 'owner']
 
 
 class NoteBookSerializer(serializers.ModelSerializer):
@@ -19,13 +19,31 @@ class NoteBookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NoteBook
-        fields = ('id', 'label', 'notes', 'dateEdited')
+        fields = ('id', 'label', 'notes', 'dateEdited', 'owner')
 
 
 class NoteBookWithoutNotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoteBook
-        fields = ('id', 'label', 'dateEdited')
+        fields = ('id', 'label', 'dateEdited', 'owner')
+
+
+class TodoListSerializerWithoutTodos(serializers.ModelSerializer):
+    class Meta:
+        model = TodoList
+        fields = "__all__"
+
+
+class TodoListSerializerWithHyperlinks(serializers.ModelSerializer):
+    todos = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='todo-detail'
+    )
+
+    class Meta:
+        model = TodoList
+        fields = "__all__"
 
 
 class TodoSerializer(serializers.ModelSerializer):

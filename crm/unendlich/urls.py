@@ -7,7 +7,10 @@ router.register(r'notebooks', views.NoteBookViewSet)
 router.register(r'notes', views.NoteViewSet)
 router.register(r'todos', views.TodoViewSet)
 router.register(r'lists', views.TodoListViewSet)
-
+router.register(r'listsWithoutTodos',
+                views.TodoListSerializerWithoutTodosViewSet)
+router.register(r'listsWithHyperlinks',
+                views.TodoListSerializerWithHyperlinksViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

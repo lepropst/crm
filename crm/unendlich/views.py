@@ -1,21 +1,17 @@
 
 # Create your views here.
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions
 
-from .serializers import TodoSerializer, NoteBookSerializer, NoteSerializer, TodoListSerializer
-
+from .serializers import TodoSerializer, NoteBookSerializer, NoteSerializer, TodoListSerializer, TodoListSerializerWithoutTodos, TodoListSerializerWithHyperlinks
 from .models import Todo, Note, NoteBook, TodoList
 
 
 class NoteBookViewSet(viewsets.ModelViewSet):
     permission_classes = [
-
         permissions.IsAuthenticated]
     queryset = NoteBook.objects.all().order_by('label')
     serializer_class = NoteBookSerializer
-
-    def get_queryset(self):
-        return self.request.user.notebooks.all()
 
 
 class NoteViewSet(viewsets.ModelViewSet):
@@ -24,9 +20,6 @@ class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all().order_by('label')
     serializer_class = NoteSerializer
 
-    def get_queryset(self):
-        return self.request.user.notes.all()
-
 
 class TodoListViewSet(viewsets.ModelViewSet):
     permission_classes = [
@@ -34,15 +27,23 @@ class TodoListViewSet(viewsets.ModelViewSet):
     queryset = TodoList.objects.all().order_by('label')
     serializer_class = TodoListSerializer
 
-    def get_queryset(self):
-        return self.request.user.lists.all()
-
 
 class TodoViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticated]
-    queryset = Todo.objects.all().order_by('label')
+    queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
-    def get_queryset(self):
-        return self.request.user.todos.all()
+
+class TodoListSerializerWithoutTodosViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAuthenticated]
+    queryset = TodoList.objects.all().order_by('label')
+    serializer_class = TodoListSerializerWithoutTodos
+
+
+class TodoListSerializerWithHyperlinksViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAuthenticated]
+    queryset = TodoList.objects.all().order_by('label')
+    serializer_class = TodoListSerializerWithHyperlinks

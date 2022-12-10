@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { credentials, getCredentials } from "./auth";
 
 export class Axios {
   public static standard_base_config: AxiosRequestConfig = {};
@@ -15,20 +16,27 @@ export class Axios {
     try {
       this.axios = axios.create({
         baseURL: "http://localhost:1337/crm/",
-
         headers: {
           "Content-Type": "application/json",
         },
       });
-      this.fetcher = (url: string) =>
-        axios
+      this.fetcher = (url: string) => {
+        console.log("fetcheeteer stuff");
+        return this.axios
           .get(url, {
             headers: {
-              Authorization:
-                "Token 433d29f37af3c4b91114648086f360efcfd1ed6f61876b683eb6391de86ba1a7",
+              "cache-control": "no-store, max-age=0",
             },
           })
-          .then((res) => res.data);
+          .then((res: any) => {
+            console.log(res);
+            return res.data;
+          })
+          .catch((e: any) => {
+            console.log(e);
+            return {};
+          });
+      };
     } catch (e) {
       throw e;
     }

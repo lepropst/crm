@@ -53,6 +53,20 @@ REST_KNOX = {
 }
 
 # Application definition
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'origin',
+    'dnt',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with']
+CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
+
 
 INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
@@ -81,22 +95,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'crm.urls'
-# CORS_ALLOWED_ORIGINS = ["http://localhost", "http://localhost:1337", '0.0.0.0']
-CORS_ALLOW_HEADERS = [
-    "Accept",
-    "Accept-Encoding",
-    "authorization",
-    "Content-Type",
-    "content-disposition",
-    "dnt",
-    "origin",
-    "User-Agent",
-    "Content-Length",
-    "X-XSRF-TOKEN",
-    "x-requested-with",
-]
 
-CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {

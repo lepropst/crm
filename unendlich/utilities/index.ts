@@ -6,6 +6,7 @@ declare module "iron-session" {
       username: string;
       password: string;
       token: string;
+      id: number;
     };
   }
 }

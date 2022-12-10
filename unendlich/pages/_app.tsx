@@ -2,15 +2,30 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { credentials, getCredentials, UserContext } from "../utilities/auth";
+import axios from "axios";
+
 const routes = [
   { route: "/", label: "Home" },
   { label: "Todos", route: "/todo-lists" },
+  { label: "Notes", route: "/notes" },
   { label: "Login", route: "/login" },
 ];
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   let name = router.pathname;
+
+  const logout = async (event: any) => {
+    const response = await axios.post("http://localhost:3000/api/logout/", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(response);
+    router.reload();
+  };
 
   if (name == "/") {
     name = "Home";
@@ -39,6 +54,15 @@ export default function App({ Component, pageProps }: AppProps) {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
+                href={"/"}
+                onClick={logout}
+              >
+                logout
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>
