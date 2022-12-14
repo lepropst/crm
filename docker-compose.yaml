@@ -28,18 +28,18 @@ services:
       - 1337:80
     depends_on:
       - web
-      - frontend
+
     volumes:
     - ./nginx/frontend/static:/usr/share/nginx/html/static
-  frontend:
-    build: ./unendlich
-    depends_on:
-      - web
-    ports: 
-      - 3000:3000
-    volumes:
-      - ./unendlich:/usr/src
-      - /usr/src/node_modules
+  # frontend:
+  #   build: ./unendlich
+  #   depends_on:
+  #     - web
+  #   ports: 
+  #     - 3000:3000
+  #   volumes:
+  #     - ./unendlich:/usr/src
+  #     - /usr/src/node_modules
 
 
 volumes:

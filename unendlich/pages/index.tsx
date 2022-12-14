@@ -1,10 +1,20 @@
 import { NextPage, NextPageContext } from "next";
+import React from "react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { credentials, getCredentials } from "../utilities/auth";
 import { withSessionSsr } from "../utilities/withSession";
 
+declare module "iron-session" {
+  interface IronSessionData {
+    user?: {
+      username: string;
+      password?: string;
+      token: string;
+    };
+  }
+}
 export const Page: NextPage<any, any> = (
   props: credentials & { protected: boolean }
 ) => {

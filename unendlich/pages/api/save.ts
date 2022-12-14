@@ -3,7 +3,15 @@ import { withIronSessionApiRoute } from "iron-session/next";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextCors from "nextjs-cors";
 import Axios from "../../utilities/axios";
-
+declare module "iron-session" {
+  interface IronSessionData {
+    user?: {
+      username: string;
+      password?: string;
+      token: string;
+    };
+  }
+}
 export default withIronSessionApiRoute(
   async function loginRoute(req, res) {
     let user = req.session.user;
@@ -15,10 +23,14 @@ export default withIronSessionApiRoute(
           req.body.type
         }/${req.body.id}/`;
         console.log(req.body);
+        const tmp = req.body.content
+          ? req.body.content.map((e) => JSON.stringify(e))
+          : [];
         const resp = await Axios.getInstance().axios.put(
           url,
           {
             ...req.body,
+            content: tmp,
             owner: user.id,
           },
           { headers: { Authorization: `Token ${user.token}` } }

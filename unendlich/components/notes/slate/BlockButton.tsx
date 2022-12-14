@@ -1,34 +1,42 @@
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { Menu } from "@headlessui/react";
+import { ReactNode, useMemo } from "react";
 import { useSlate } from "slate-react";
-import { TEXT_ALIGN_TYPES } from "./config";
-import { isBlockActive, toggleBlock } from "./globalfunctions";
+import { FORMATS, TEXT_ALIGN_TYPES } from "./config";
+import { CustomEditor } from "./handlers";
 import { Icon } from "./Icon";
-
+import React from "react";
+type Props = {
+  format: typeof FORMATS[number];
+  icon: IconProp;
+  children?: ReactNode;
+  eventHandler?: (e: any) => void;
+  formatOptions?: { size?: number };
+};
 export const BlockButton = ({
   format,
   icon,
-}: {
-  format: string;
-  icon: string;
-}) => {
+  children,
+  eventHandler,
+  formatOptions = {},
+}: Props) => {
   const editor = useSlate();
-  const active = isBlockActive(
-    editor,
-    format,
-    TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
-  )
-    ? "bg-primarydark"
-    : "bg-primarylight";
+
   return (
-    <button
-      className={`${active}`}
-      onMouseDown={(event) => {
+    <Menu.Button
+      onMouseDown={(event: any) => {
         event.preventDefault();
-        toggleBlock(editor, format);
+        eventHandler
+          ? eventHandler(event)
+          : CustomEditor.toggleBlock(editor, format, formatOptions);
       }}
+      className={`${
+        CustomEditor.isBlockActive(editor, format)
+          ? "border border-primarydark"
+          : ""
+      }`}
     >
-      <Icon icon={icon} />
-    </button>
+      {children ? children : <Icon icon={icon} />}
+    </Menu.Button>
   );
 };
-
-export default BlockButton;

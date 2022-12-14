@@ -72,7 +72,7 @@ export function NoteBookPreview({
           >
             delete
           </a>
-          <Link href={`/notes/${data.id}`}>Open</Link>
+          <Link href={`/notebooks/${data.id}`}>Open</Link>
         </div>
         <p>{data.dateEdited}</p>
       </form>

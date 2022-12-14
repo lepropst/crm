@@ -1,12 +1,12 @@
+import { Menu, Transition } from "@headlessui/react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { SyntheticEvent, useEffect, useState } from "react";
-import useSWR, { mutate } from "swr";
+import { Fragment, SyntheticEvent, useEffect, useState } from "react";
+import useSWR from "swr";
 import Axios from "../../utilities/axios";
 import { Note, NotePreview } from "../notes";
-import { NoteDisplay } from "../notes/NoteDisplay";
-import { Renderer as NoteRenderer } from "../notes/renderer";
 import NoteBook from "./model";
+import { TwoColumnLayout } from "./TwoColumnLayout";
 
 export function Renderer({ user }: { user: any }) {
   const router = useRouter();
@@ -24,11 +24,14 @@ export function Renderer({ user }: { user: any }) {
       console.log("error occured");
       throw new Error(res.data);
     }
+    console.log(res.data);
     return NoteBook.fromNoteBook(res.data);
   };
-  const { data, error } = useSWR(`/unendlich/notebooks/${id}/`, fetcher);
+  const { data, mutate, error } = useSWR(`/unendlich/notebooks/${id}`, fetcher);
   const [countdown, setCountDown] = useState(2);
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<any>({ label: "" });
+
+  const triggerReload = async () => {};
   useEffect(() => {
     if (countdown === 0) {
       setCountDown(2);
@@ -48,15 +51,32 @@ export function Renderer({ user }: { user: any }) {
               : nb.content,
           type: "notes",
         });
-        mutate(`/unendlich/notebooks/${id}/`);
+        setFormData({ label: "" });
+        mutate();
       } catch (e) {
         console.log(e);
       }
     },
     saveNoteBook: async (nb: NoteBook) => {
       try {
-        const res = axios.post("/api/save", { type: "notebooks", ...nb });
-        mutate(`/unendlich/notebooks/${id}/`);
+        const res = await axios.post("/api/save", { type: "notebooks", ...nb });
+        await mutate();
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    deleteNote: async (id: number | undefined) => {
+      if (id === undefined) {
+        alert("unable to parse id");
+        return;
+      }
+      try {
+        const res = await axios.post("/api/delete/", {
+          type: "notes",
+          id,
+        });
+
+        await mutate();
       } catch (e) {
         console.log(e);
       }
@@ -97,9 +117,13 @@ export function Renderer({ user }: { user: any }) {
           add note
         </button>
       </div>
-      <div className="grid grid-cols-2"></div>
+
       {data.notes && data.notes.length > 0 && (
-        <NoteDisplay notes={data.notes.map((e) => Note.fromNote(e))} />
+        <TwoColumnLayout
+          triggerReload={triggerReload}
+          deleteNote={api.deleteNote}
+          data={data}
+        />
       )}
     </div>
   );

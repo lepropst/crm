@@ -6,11 +6,12 @@ import { useEffect, useState } from "react";
 
 import { credentials, getCredentials, UserContext } from "../utilities/auth";
 import axios from "axios";
+import Head from "next/head";
 
 const routes = [
   { route: "/", label: "Home" },
   { label: "Todos", route: "/todo-lists" },
-  { label: "Notes", route: "/notes" },
+  { label: "Notebooks", route: "/notebooks" },
   { label: "Login", route: "/login" },
 ];
 export default function App({ Component, pageProps }: AppProps) {
@@ -36,6 +37,12 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <Head>
+        <script
+          defer
+          src="/node_modules/@fortawesome/fontawesome-free/js/solid.js"
+        ></script>
+      </Head>
       <nav className="flex items-center justify-between flex-wrap bg-primarydark p-6 nav-hover-container">
         <div className="flex items-center flex-shrink-0 text-white">
           <span className="font-semibold text-xl ">{name}</span>

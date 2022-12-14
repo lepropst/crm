@@ -1,14 +1,21 @@
 import { ButtonHTMLAttributes, useState } from "react";
 import { NoteBook } from "../notebooks";
+import React from "react";
 type Props = {
+  deleteNote: (id: number | undefined) => Promise<void>;
   notes: NoteBook[];
 };
-export function NoteDisplay({ notes }: Props) {
+export function NoteDisplay({ notes, deleteNote }: Props) {
+  const [s, st] = useState(false);
+  const triggerReload = () => st(!s);
+  console.log(notes);
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 grid-rows-auto">
       {notes.map((e: NoteBook) => {
         const [open, setOpen] = useState(false);
-
+        if (!e.id) {
+          return <>undefined id</>;
+        }
         return (
           <div className="relative flex justify-between">
             <p>
@@ -44,12 +51,16 @@ export function NoteDisplay({ notes }: Props) {
                 </li>
 
                 <li>
-                  <a
-                    href="#"
+                  <button
+                    onClick={async (ev) => {
+                      ev.preventDefault();
+                      await deleteNote(e.id);
+                      triggerReload();
+                    }}
                     className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                   >
                     Delete
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>

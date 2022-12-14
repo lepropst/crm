@@ -1,22 +1,30 @@
-type Props = { attributes: any; children: any; leaf: any };
+import { CustomElement } from "./config";
+import React from "react";
+type Props = {
+  attributes: any;
+  children: any;
+  leaf: any;
+};
 export const Leaf = ({ attributes, children, leaf }: Props) => {
+  if (leaf.indent) {
+    console.log("indent icomig");
+    children = <span {...attributes}>{children}</span>;
+  }
   if (leaf.bold) {
-    children = <strong>{children}</strong>;
+    children = <strong {...attributes}>{children}</strong>;
   }
 
   if (leaf.code) {
-    children = <code>{children}</code>;
+    children = <code {...attributes}>{children}</code>;
   }
 
   if (leaf.italic) {
-    children = <em>{children}</em>;
+    children = <em {...attributes}>{children}</em>;
   }
 
   if (leaf.underline) {
-    children = <u>{children}</u>;
+    children = <u {...attributes}>{children}</u>;
   }
 
   return <span {...attributes}>{children}</span>;
 };
-
-export default Leaf;

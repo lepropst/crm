@@ -1,27 +1,34 @@
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { Menu } from "@headlessui/react";
+import { useMemo } from "react";
 import { useSlate } from "slate-react";
+import React from "react";
+import { CustomEditor } from "./handlers";
 import { Icon } from "./Icon";
-import { toggleMark, isMarkActive } from "./globalfunctions";
-import { TEXT_ALIGN_TYPES } from "./config";
 
-type Props = { format: string; icon: string };
-export const MarkButton = ({ format, icon }: Props) => {
+export const MarkButton = ({
+  format,
+  icon,
+}: {
+  format: string;
+  icon: IconProp;
+}) => {
   const editor = useSlate();
-  const active = isMarkActive(
-    editor,
-
-    TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
-  )
-    ? "bg-primarydark"
-    : "bg-primarylight";
+  let active = useMemo(
+    () => CustomEditor.isMarkActive(editor, format),
+    [format]
+  );
   return (
-    <button
-      className={active}
-      onMouseDown={(event) => {
+    <Menu.Button
+      className={active ? "bg-gray-500" : ""}
+      onMouseDown={(event: any) => {
         event.preventDefault();
-        toggleMark(editor, format);
+        CustomEditor.toggleMark(editor, format);
       }}
     >
       <Icon icon={icon} />
-    </button>
+    </Menu.Button>
   );
 };
+
+export default MarkButton;

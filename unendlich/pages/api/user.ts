@@ -1,5 +1,13 @@
 import { withIronSessionApiRoute } from "iron-session/next";
-
+declare module "iron-session" {
+  interface IronSessionData {
+    user?: {
+      username: string;
+      password?: string;
+      token: string;
+    };
+  }
+}
 export default withIronSessionApiRoute(
   function userRoute(req, res) {
     res.send({ user: req.session.user });
