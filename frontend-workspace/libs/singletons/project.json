@@ -1,0 +1,26 @@
+{
+  "name": "singletons",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/singletons/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/singletons",
+        "main": "libs/singletons/src/index.ts",
+        "tsConfig": "libs/singletons/tsconfig.lib.json",
+        "assets": ["libs/singletons/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/singletons/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}

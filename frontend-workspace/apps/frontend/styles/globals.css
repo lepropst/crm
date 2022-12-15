@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.nav-hover-container .nav-hover-item {
+  display:none;
+}
+:hover.nav-hover-container .nav-hover-item {
+  display: block;
+}
